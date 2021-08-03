@@ -6,44 +6,38 @@ using Tennis;
 
 namespace SetAnalyzer
 {
-    public class SetAnalyzer : IAnalyzer<List<int>, Set<string>>
+    public class SetAnalyzer : IAnalyzer<List<int>, Set<int>>
     {
-        public List<int> Analyze(Set<string> set)
+        public List<int> Analyze(Set<int> set)
         {
             List<int> result = new List<int>();
 
+            List<int> matchPointIndexes = set.GetMatchPointIndexes();
+
             result.Add(0);
 
-            SetConverter setConverter = new SetConverter();
-
-            Set<int> convertedSet = setConverter.Convert(set);
-
-            var matchPoints = convertedSet.MatchPoints;
-
-            for (int i = 0; i < matchPoints.Count; ++i)
+            for (int k = 0; k < matchPointIndexes.Count - 1; ++k)
             {
-                var matchPoints15 = convertedSet.MatchPoints[i].MatchPoints15;
-
-                for (int j = 0; j < matchPoints15.Count - 1; ++j)
+                for (int i = matchPointIndexes[k] + 1; i < matchPointIndexes[k + 1] - 1; ++i)
                 {
-                    int sub = (matchPoints15[j + 1].Item1 - matchPoints15[j].Item1) 
-                        - (matchPoints15[j + 1].Item2 - matchPoints15[j].Item2);
+                    int sub = (set.MatchPoints[i + 1].Item1 - set.MatchPoints[i].Item1)
+                        - (set.MatchPoints[i + 1].Item2 - set.MatchPoints[i].Item2);
 
-                    int analyzedPoint15 = sub < 0 ? (int)Math.Floor((decimal)sub / 15) : (int)Math.Ceiling((decimal)sub / 15);
+                    int analyzedPoint = sub > 0 ? (int)Math.Ceiling((decimal)sub / 15) : (int)Math.Floor((decimal)sub / 15);
 
-                    result.Add(result[result.Count - 1] + analyzedPoint15);
+                    result.Add(result[result.Count - 1] + Math.Sign(sub));
                 }
 
-                //int analyzedMatchPoint = Math.Sign(matchPoints[i].MatchPointScore.Item1 - matchPoints[i].MatchPointScore.Item2);
+                if (k != matchPointIndexes.Count - 2)
+                {
+                    int t = set.MatchPoints[matchPointIndexes[k + 1] - 1].Item1
+                - set.MatchPoints[matchPointIndexes[k + 1] - 1].Item2;
 
-                int analyzedMatchPoint = Math.Sign(matchPoints15[matchPoints15.Count - 1].Item1 - matchPoints15[matchPoints15.Count - 1].Item2);
-
-                result.Add(result[result.Count - 1] + analyzedMatchPoint);
+                    result.Add(result[result.Count - 1] + Math.Sign(t));
+                }
             }
 
             return result;
         }
-
-
     }
 }

@@ -4,6 +4,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.Drawing;
 using System.Linq;
+using Tennis;
 
 namespace ChartPoints
 {
@@ -28,31 +29,31 @@ namespace ChartPoints
             chartGraphics = Graphics.FromImage(chartBitmap);
         }
 
-        public Bitmap GetChart(List<int> values)
+        public Bitmap GetChart(Set<int> set, List<int> analyzedPoints)
         {
-            /*int maxAbs = Math.Abs(values.Max()) > Math.Abs(values.Min()) ? Math.Abs(values.Max()) : Math.Abs(values.Min());
 
+            try
+            {
+                DrawGrid(set, analyzedPoints);
 
-            DrawHorizontalLines(maxAbs);
+                DrawChart(analyzedPoints);
+            }
+            catch 
+            {
 
-            DrawVerticalLines(values.Count, maxAbs);
-
-            */
-
-            DrawGrid(values);
-
-            DrawChart(values);
+            }
 
             return chartBitmap;
         }
 
-        private void DrawGrid(List<int> values)
+        private void DrawGrid(Set<int> set, List<int> analyzedPoints)
         {
-            int maxAbs = Math.Abs(values.Max()) > Math.Abs(values.Min()) ? Math.Abs(values.Max()) : Math.Abs(values.Min());
+
+            int maxAbs = Math.Abs(analyzedPoints.Max()) > Math.Abs(analyzedPoints.Min()) ? Math.Abs(analyzedPoints.Max()) : Math.Abs(analyzedPoints.Min());
 
             DrawHorizontalLines(maxAbs);
 
-            DrawVerticalLines(values.Count, maxAbs);
+            DrawVerticalLines(set, maxAbs, analyzedPoints.Count);
         }
 
         private void DrawChart(List<int> values)
@@ -67,15 +68,6 @@ namespace ChartPoints
 
             for (int i = 0; i < values.Count; ++i)
             {
-                /*PointF p1 = new PointF(stepX * (i), 0);
-
-                PointF p2 = new PointF(stepX * (i), height);
-
-                PointF p3 = new PointF(stepX * (i), stepY * maxAbs);
-
-                chartGraphics.DrawLine(new Pen(new SolidBrush(Color.Black), 0.1f), p1, p2);
-
-                chartGraphics.DrawString(i.ToString(), new Font("Microsft Sans Serif", 6), new SolidBrush(Color.Black), p3);*/
 
                 PointF point = new PointF(stepX * i, stepY * (maxAbs - values[i]));
 
@@ -102,13 +94,16 @@ namespace ChartPoints
 
                 chartGraphics.DrawLine(new Pen(new SolidBrush(color), 0.1f), p1, p2);
 
-                chartGraphics.DrawString((maxAbs - i).ToString(), new Font("Microsft Sans Serif", 6), new SolidBrush(Color.Black), p3);
+                if (i != maxAbs)
+                {
+                    chartGraphics.DrawString((maxAbs - i).ToString(), new Font("Microsft Sans Serif", 6), new SolidBrush(Color.Black), p3);
+                }
 
             }
 
         }
 
-        private void DrawVerticalLines(int countValues, int maxAbs)
+        private void DrawVerticalLines(Set<int> set, int maxAbs, int countValues)
         {
             float stepX = width / countValues;
 
@@ -124,8 +119,18 @@ namespace ChartPoints
 
                 chartGraphics.DrawLine(new Pen(new SolidBrush(Color.Black), 0.1f), p1, p2);
 
-                chartGraphics.DrawString(i.ToString(), new Font("Microsft Sans Serif", 6), new SolidBrush(Color.Black), p3);
+                if (set.GetMatchPointIndexes().Contains(i) && i != countValues)
+                {
+                    int index = set.GetMatchPointIndexes().IndexOf(i);
+
+                    chartGraphics.DrawLine(new Pen(new SolidBrush(Color.DarkGoldenrod), 3f), p1, p2);
+
+                    chartGraphics.DrawString(set.MatchPoints[set.GetMatchPointIndexes()[index]].ToString()
+                        , new Font("Arial", 8), new SolidBrush(Color.Black), p3);
+                }
+                
             }
+
         }
     }
 }

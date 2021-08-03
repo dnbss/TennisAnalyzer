@@ -6,60 +6,63 @@ using Tennis;
 
 namespace SetAnalyzer
 {
-    class SetConverter : IConverter<Set<string>, Set<int>>
+    public class SetConverter : IConverter<Set<string>, Set<int>>
     {
         public Set<int> Convert(Set<string> data)
         {
             var matchPoints = data.MatchPoints;
 
-            List<MatchPoint<int>> setMatchPoints = new List<MatchPoint<int>>();
+            List<(int, int)> convertedMatchPoints = new List<(int, int)>();
 
-            foreach (var matchPoint in matchPoints)
+            for (int i = 0; i < matchPoints.Count; ++i)
             {
-                var convertedMatchPoint = (int.Parse(matchPoint.MatchPointScore.Item1), int.Parse(matchPoint.MatchPointScore.Item2));
-
-                var matchPoints15InMatchPoint = matchPoint.MatchPoints15;
-
-                List<(int, int)> convertedMatchPoints15 = new List<(int, int)>();
-
-                foreach (var matchPoint15 in matchPoints15InMatchPoint)
+                if (matchPoints[i].Item1.Contains("Match Point "))
                 {
-                    int first = 0;
+                    (string, string) s = (matchPoints[i].Item1.Replace("Match Point ", ""), matchPoints[i].Item2);
 
-                    int second = 0;
-
-                    try
-                    {
-                        first = int.Parse(matchPoint15.Item1);
-
-                        second = int.Parse(matchPoint15.Item2);
-                    }
-                    catch
-                    {
-                        if (matchPoint15.Item1 == "A")
-                        {
-                            first = 55;
-
-                            second = int.Parse(matchPoint15.Item2);
-                        }
-                        else if (matchPoint15.Item2 == "A")
-                        {
-                            second = 55;
-
-                            first = int.Parse(matchPoint15.Item1);
-                        }
-                    }
-
-                    convertedMatchPoints15.Add((first, second));
-
+                    convertedMatchPoints.Add(ConvertOneScore(s));
+                }
+                else
+                {
+                    convertedMatchPoints.Add(ConvertOneScore(matchPoints[i]));
                 }
 
-                setMatchPoints.Add(new MatchPoint<int>(convertedMatchPoint, convertedMatchPoints15));
             }
 
-            return new Set<int>(setMatchPoints);
+            return new Set<int>(convertedMatchPoints, data.NumberSet);
         }
 
+        private (int, int) ConvertOneScore((string, string) matchPoints)
+        {
+            int first = 0;
 
+            int second = 0;
+
+            try
+            {
+                first = int.Parse(matchPoints.Item1);
+
+                second = int.Parse(matchPoints.Item2);
+            }
+            catch
+            {
+                if (matchPoints.Item1 == "A")
+                {
+                    first = 55;
+
+                    second = int.Parse(matchPoints.Item2);
+                }
+
+                else if (matchPoints.Item2 == "A")
+                {
+                    second = 55;
+
+                    first = int.Parse(matchPoints.Item1);
+                }
+
+            }
+
+            return (first, second);
+        }
     }
 }

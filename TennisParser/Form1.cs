@@ -1,4 +1,5 @@
 ﻿using MatchesParser;
+using SetAnalyzer;
 using System;
 using System.Drawing;
 using System.Threading.Tasks;
@@ -47,7 +48,6 @@ namespace TennisParser
 
             ShowMatches();
 
-            
         }
 
         private void ShowSetAnalyze(Set<string> set)
@@ -56,17 +56,18 @@ namespace TennisParser
 
             SetAnalyzer.SetAnalyzer setAnalyzer = new SetAnalyzer.SetAnalyzer();
 
-            var list = setAnalyzer.Analyze(set);
+            SetConverter setConverter = new SetConverter();
 
-            foreach (var point in list)
+            var analyzedPoints = setAnalyzer.Analyze(setConverter.Convert(set));
+
+            foreach (var point in analyzedPoints)
             {
                 analyzedPointsListBox.Items.Add(point);
             }
 
             ChartPoints.ChartPoints chartPoints = new ChartPoints.ChartPoints(pictureBox1.Width, pictureBox1.Height);
 
-            pictureBox1.Image = chartPoints.GetChart(list);
-
+            pictureBox1.Image = chartPoints.GetChart(setConverter.Convert(set), analyzedPoints);
 
         }
 
@@ -97,38 +98,23 @@ namespace TennisParser
 
             sets = await parserTennis.GetMatchStatistics();
 
-            int i = 1;
+           
 
-            try
+            for (int i = 0; i < sets.Length; ++i)
             {
-                foreach (var set in sets)
+                concreteMatchInfoListBox.Items.Add("===========================");
+
+                concreteMatchInfoListBox.Items.Add("SET " + sets[i].NumberSet.ToString());
+
+                foreach (var matchPoint in sets[i].MatchPoints)
                 {
-
-                    concreteMatchInfoListBox.Items.Add("===========================");
-
-                    concreteMatchInfoListBox.Items.Add("SET " + i);
-
-                    foreach (var matchPoint in set.MatchPoints)
-                    {
-
-                        foreach (var matchPoint15 in matchPoint.MatchPoints15)
-                        {
-                            concreteMatchInfoListBox.Items.Add("\t\t" + matchPoint15.Item1 + "-" + matchPoint15.Item2);
-                        }
-
-                        concreteMatchInfoListBox.Items.Add("\tMatch point " + matchPoint.MatchPointScore.Item1
-                            + "-" + matchPoint.MatchPointScore.Item2);
-                    }
-
-                    i++;
+                    concreteMatchInfoListBox.Items.Add("\t" + matchPoint.Item1 + "-" + matchPoint.Item2);
                 }
-            }
-            catch
-            {
-                // ignored
             }
 
             currentSetNumericUpDown.Maximum = sets.Length;
+
+            currentSetNumericUpDown.Value = currentSetNumericUpDown.Maximum;
 
             ShowSetAnalyze(sets[(int)currentSetNumericUpDown.Value - 1]);
         }

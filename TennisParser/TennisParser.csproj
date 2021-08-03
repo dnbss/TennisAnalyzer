@@ -14,7 +14,6 @@
     <ProjectReference Include="..\MatchesParser\MatchesParser.csproj" />
     <ProjectReference Include="..\Parser\Parser.csproj" />
     <ProjectReference Include="..\SetAnalyzer\SetAnalyzer.csproj" />
-    <ProjectReference Include="..\TennisConverter\TennisConverter.csproj" />
     <ProjectReference Include="..\Tennis\Tennis.csproj" />
   </ItemGroup>
 

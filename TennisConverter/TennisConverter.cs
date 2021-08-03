@@ -7,17 +7,29 @@ namespace TennisConverter
 {
     public static class TennisConverter
     {
-        public static Set<string> ConvertToSet(List<string> matchPointsInfo, List<string> matchPoints15)
+        public static IEnumerable<AngleSharp.Dom.> ConvertToSet(List<string> matchPoints)
         {
-            List<MatchPoint<string>> matchPoints = new List<MatchPoint<string>>();
+            /*List<MatchPoint<string>> matchPoints = new List<MatchPoint<string>>();
 
             for (int i = 1; i < matchPointsInfo.Count; ++i)
             {
                 matchPoints.Add(ConvertToMatchPoint(matchPointsInfo[i], matchPoints15[i - 1]));
             }
 
-            return new Set<string>(matchPoints);
+            return new Set<string>(matchPoints);*/
+
+            List<string> list = new List<string>();
+
+            foreach(var matchPoint in matchPoints)
+            {
+                if (!matchPoint.Contains(","))
+                {
+                    list.Add()
+                }
+            }
         }
+
+
 
         public static MatchPoint<string> ConvertToMatchPoint(string matchPointInfo, string matchPoint15)
         {
